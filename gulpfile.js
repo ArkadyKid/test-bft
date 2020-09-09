@@ -4,14 +4,12 @@ const browserSync = require('browser-sync');
 const autoprefixer = require('gulp-autoprefixer');
 const notify = require('gulp-notify');
 const csso = require('gulp-csso');
-const twig = require('gulp-twig');
-const uglify = require('gulp-uglify');
-const rename = require('gulp-rename');
 const imagemin = require('gulp-imagemin');
 const sourcemaps = require('gulp-sourcemaps');
-const data = require('gulp-data');
-const fs = require('fs');
 const webpackStream = require('webpack-stream');
+const posthtml = require('gulp-posthtml');
+const htmlMin = require('gulp-htmlmin');
+const include = require('posthtml-include');
 
 function bs(done) {
   browserSync.init({
@@ -30,9 +28,10 @@ function browserSyncReload(done) {
 
 function styles() {
   return gulp.src([
-    'src/sass/main.scss'])
+      'src/sass/main.scss'])
     .pipe(sourcemaps.init())
-    .pipe(sass({ outputStyle: 'expanded' }).on('error', notify.onError()))
+    .pipe(sass({ outputStyle: 'expanded' })
+      .on('error', notify.onError()))
     .pipe(autoprefixer(['last 4 versions']))
     .pipe(csso({
       comments: false,
@@ -42,8 +41,14 @@ function styles() {
     .pipe(browserSync.stream());
 }
 
-function twigGulp() {
-  return gulp.src('src/index.twig').pipe(twig())
+function html() {
+  return gulp.src('src/*.html')
+    .pipe(posthtml([
+      include(),
+    ]))
+    .pipe(htmlMin({
+      collapseWhitespace: true,
+    }))
     .pipe(gulp.dest('dist'));
 }
 
@@ -51,12 +56,15 @@ function images() {
   return gulp.src('src/assets/*')
     .pipe(imagemin([
       imagemin.gifsicle({ interlaced: true }),
-      imagemin.mozjpeg({ quality: 75, progressive: true }),
+      imagemin.mozjpeg({
+        quality: 75,
+        progressive: true,
+      }),
       imagemin.optipng({ optimizationLevel: 5 }),
       imagemin.svgo({
         plugins: [
-          {removeViewBox: true},
-          {cleanupIDs: false}
+          { removeViewBox: true },
+          { cleanupIDs: false },
         ],
       }),
     ]))
@@ -82,24 +90,22 @@ function scripts() {
         ],
       },
     }))
-    .pipe(gulp.dest('./dist/js'))
-    .pipe(uglify())
-    .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest('./dist/js'));
 }
 
 function code() {
-  return gulp.src('dist/*.html').pipe(browserSync.reload({ stream: true }));
+  return gulp.src('dist/*.html')
+    .pipe(browserSync.reload({ stream: true }));
 }
 
 function watchFiles() {
   gulp.watch('src/**/*.scss', styles);
   gulp.watch('src/**/*.js', gulp.series(scripts, browserSyncReload));
-  gulp.watch('src/*.twig',
-    gulp.series(gulp.parallel(code, twigGulp), browserSyncReload));
+  gulp.watch('src/*.html',
+    gulp.series(gulp.parallel(code, html), browserSyncReload));
 }
 
-const build = gulp.parallel(styles, scripts, images, twigGulp);
+const build = gulp.parallel(styles, scripts, images, html);
 const watch = gulp.parallel(watchFiles, bs);
 
 exports.build = build;
