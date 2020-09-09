@@ -1,0 +1,9 @@
+# https://eslint.org/docs/user-guide/configuring#specifying-environments
+env:
+  node: true
+
+extends:
+  - 'airbnb-base'
+
+rules:
+  import/extensions: 0
