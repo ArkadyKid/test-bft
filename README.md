@@ -1,8 +1,5 @@
 # Test BFT
 
-## Stack 
-Twig, Scss, Gulp, ESLint, Babel, Webpack
-
 ## Install
 
 ````
