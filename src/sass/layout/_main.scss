@@ -10,3 +10,13 @@
   line-height: 42px;
   letter-spacing: 0.1px;
 }
+
+.main__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.main__item:not(:last-child) {
+  margin-bottom: 106px;
+}
