@@ -1,4 +1,4 @@
-# Gulp template
+# Test BFT
 
 ## Stack 
 Twig, Scss, Gulp, ESLint, Babel, Webpack
@@ -6,6 +6,6 @@ Twig, Scss, Gulp, ESLint, Babel, Webpack
 ## Install
 
 ````
-$ git clone git@github.com:ArkadyKid/gulp-template.git
+$ git clone git@github.com:ArkadyKid/test-bft.git
 $ npm install
 ````
